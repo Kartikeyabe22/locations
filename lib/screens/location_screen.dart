@@ -3,6 +3,7 @@ import 'package:locations/screens/loading_screen.dart';
 import 'package:locations/utilities/constants.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:locations/services/weather.dart';
+import 'package:locations/screens/city_screen.dart';
 
 
 
@@ -33,7 +34,14 @@ class _LocationScreenState extends State<LocationScreen> {
   updateUI(dynamic weatherData)
   async{
     setState(() {
-
+   if(weatherData==null)
+     {
+       temperature=0;
+       weatherIcon='Error';
+       weatherMessage='Unable to get weather data';
+       cityName='';
+       return;
+     }
 
     var weatherDescription = weatherData['weather'][0]['description'];
     print(weatherDescription);
@@ -41,6 +49,10 @@ class _LocationScreenState extends State<LocationScreen> {
 
     double temp=weatherData['main']['temp'];
       temperature = temp.toInt() ;
+      if(temperature!>70)
+        {
+          temperature=temperature!-273;
+        }
     print(temperature);
 
 
@@ -78,14 +90,27 @@ class _LocationScreenState extends State<LocationScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: ()async {
+                      var weatherData=await weather.getLocationWeather();
+                      updateUI(weatherData);
+                    },
                     child: Icon(
-                      Icons.near_me,
+                      Icons.near_me,//location icon
                       size: 50.0,
                     ),
                   ),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () async{
+                   var typedName = await  Navigator.push(context,MaterialPageRoute(builder:(context){
+                        return CityScreen();
+                      }));
+                   print(typedName);
+                   if(typedName != null)
+                     {
+                      var weatherData= await weather.getCityWeather(typedName);
+                      updateUI(weatherData);
+                     }
+                    },
                     child: Icon(
                       Icons.location_city,
                       size: 50.0,
@@ -94,17 +119,24 @@ class _LocationScreenState extends State<LocationScreen> {
                 ],
               ),
               Padding(
-                padding: EdgeInsets.only(left: 15.0),
+                padding: EdgeInsets.only(left: 30.0),
                 child: Row(
                   children: <Widget>[
+
                     Text(
-                      '$temperature',
+
+                      '${(temperature!)}',
                       style: kTempTextStyle,
                     ),
-                    Text(
-                      weatherIcon,
-                      style: TextStyle(
-                        fontSize: 100,
+
+
+                    Padding(
+                      padding: const EdgeInsets.only(left:10.0),
+                      child: Text(
+                        weatherIcon,
+                        style: TextStyle(
+                          fontSize: 70,
+                        ),
                       ),
                     ),
                   ],
@@ -126,17 +158,3 @@ class _LocationScreenState extends State<LocationScreen> {
   }
 }
 
-
-
-//
-// var weatherDescription = decodeData['weather'][0]['description'];
-// print(weatherDescription);
-//
-// int condition=decodeData['weather'][0]['id'];
-// print(condition);
-//
-// double temperature=decodeData['main']['temp'];
-// print(temperature);
-//
-// String cityName=decodeData['name'];
-// print(cityName);
