@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:locations/services/location.dart';
+import 'package:http/http.dart'as http;
+import 'dart:convert';
+import 'package:locations/services/networking.dart';
+import 'package:locations/screens/location_screen.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+
+
+const apiKey='896d520e20f04d5efd8c2fc1948f15c8';
 
 
 String str='';
 String n='';
+
 
 
 class LoadingScreen extends StatefulWidget {
@@ -15,70 +24,66 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
+
+  late double longitude;
+  late double latitude;
+
   @override
   void initState() {
 
     super.initState();
-    getLocation();
+    getLocationData();
+
   }
 
-  void getLocation()
+  void getLocationData()
  async {
     Location location= Location();//creating object
     await location.getCurrentLocation();
-    print(location.latitude);
-    print(location.longitude);
+    latitude=location.latitude;
+    longitude=location.longitude;
 
+
+
+    NetworkHelper networkhelper = NetworkHelper('https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&appid=$apiKey');
+
+    var weatherData = await networkhelper.getData();
+
+
+
+
+
+    // var weatherDescription = weatherData['weather'][0]['description'];
+    // print(weatherDescription);
+    //
+    // int condition=weatherData['weather'][0]['id'];
+    // print(condition);
+    //
+    // double temperature=weatherData['main']['temp'];
+    // print(temperature);
+    //
+    // String cityName=weatherData['name'];
+    // print(cityName);
+
+    Navigator.push(context,MaterialPageRoute(builder:(context){
+      return LocationScreen(
+        locationWeather: weatherData,
+      );
+    }));
   }
-
-
 
 
   @override
   Widget build(BuildContext context) {
-    String myMargin= 'abc';
-    double myMarrginASDouble;
-    try {
-      myMarrginASDouble = double.parse(myMargin);
 
-    }
-    catch(e){
-     print (e);
-     myMarrginASDouble=30.0;
-    }
     return Scaffold(
-        body: Container(
-          margin: EdgeInsets.all( myMarrginASDouble ?? 50),
-          color: Colors.red,
-        )
+      backgroundColor: Colors.white,
+        body: Center(
+      child: SpinKitPumpingHeart(
+        color:Colors.red,
+       size: 300,
+      ),),
     );
-      //
-      // body: Center(
-      //   child:Column(
-      //     mainAxisAlignment: MainAxisAlignment.center,
-      //     children:[
-      //
-      //       Text(
-      //         str
-      //         ,
-      //         style: TextStyle(
-      //           color: Colors.white,
-      //           fontWeight: FontWeight.bold,
-      //         ),
-      //          ),
-      //    SizedBox(
-      //      height: 70,
-      //    ),
-      //
-      //    ElevatedButton(
-      //     onPressed: () {
-      //       _determinePosition();
-      //     },
-      //     child: Text('Get Location'),
-      //   ),
-      // ]
-      // ),
-      // ),
-   //  );
   }
 }
+
