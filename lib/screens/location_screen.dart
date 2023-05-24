@@ -20,6 +20,7 @@ class LocationScreen extends StatefulWidget {
 
 class _LocationScreenState extends State<LocationScreen> {
   WeatherModel weather=WeatherModel();
+   String weatherDescription='';
    int? temperature;
    String weatherIcon='';
    String? cityName;
@@ -43,7 +44,7 @@ class _LocationScreenState extends State<LocationScreen> {
        return;
      }
 
-    var weatherDescription = weatherData['weather'][0]['description'];
+     weatherDescription = weatherData['weather'][0]['description'];
     print(weatherDescription);
 
 
@@ -81,76 +82,100 @@ class _LocationScreenState extends State<LocationScreen> {
           ),
         ),
         constraints: BoxConstraints.expand(),
-        child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  ElevatedButton(
-                    onPressed: ()async {
-                      var weatherData=await weather.getLocationWeather();
-                      updateUI(weatherData);
-                    },
-                    child: Icon(
-                      Icons.near_me,//location icon
-                      size: 50.0,
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () async{
-                   var typedName = await  Navigator.push(context,MaterialPageRoute(builder:(context){
-                        return CityScreen();
-                      }));
-                   print(typedName);
-                   if(typedName != null)
-                     {
-                      var weatherData= await weather.getCityWeather(typedName);
-                      updateUI(weatherData);
-                     }
-                    },
-                    child: Icon(
-                      Icons.location_city,
-                      size: 50.0,
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: EdgeInsets.only(left: 30.0),
-                child: Row(
+        child: SingleChildScrollView(
+          child: SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-
-                    Text(
-
-                      '${(temperature!)}',
-                      style: kTempTextStyle,
+                    ElevatedButton(
+                      onPressed: ()async {
+                        var weatherData=await weather.getLocationWeather();
+                        updateUI(weatherData);
+                      },
+                      child: Icon(
+                        Icons.near_me,//location icon
+                        size: 50.0,
+                      ),
                     ),
-
-
-                    Padding(
-                      padding: const EdgeInsets.only(left:10.0),
-                      child: Text(
-                        weatherIcon,
-                        style: TextStyle(
-                          fontSize: 70,
-                        ),
+                    ElevatedButton(
+                      onPressed: () async{
+                     var typedName = await  Navigator.push(context,MaterialPageRoute(builder:(context){
+                          return CityScreen();
+                        }));
+                     print(typedName);
+                     if(typedName != null)
+                       {
+                        var weatherData= await weather.getCityWeather(typedName);
+                        updateUI(weatherData);
+                       }
+                      },
+                      child: Icon(
+                        Icons.location_city,
+                        size: 50.0,
                       ),
                     ),
                   ],
                 ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(right: 15.0),
-                child: Text(
-                  '$weatherMessage in $cityName',
-                  textAlign: TextAlign.right,
-                  style: kMessageTextStyle,
+               SizedBox(
+                 height: 10,
+               ),
+
+
+                Padding(
+                  padding: EdgeInsets.all( 15.0),
+                  child: Row(
+                    children: <Widget>[
+
+                      Text(
+
+                        '${(temperature!)}',
+                        style: kTempTextStyle,
+                      ),
+
+
+                      Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: Text(
+                          weatherIcon,
+                          style: TextStyle(
+                            fontSize: 70,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Text(
+
+                    '${(weatherDescription)}',
+                    style: TextStyle(
+                        fontSize: 70,
+                        fontWeight: FontWeight.bold
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: EdgeInsets.all(15.0),
+                  child: Text(
+                    '$weatherMessage in $cityName',
+                    textAlign: TextAlign.right,
+                    style: kMessageTextStyle,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
