@@ -164,7 +164,7 @@ class _LocationScreenState extends State<LocationScreen> {
                   ),
                 ),
                 SizedBox(
-                  height: 10,
+                  height: 12,
                 ),
                 Padding(
                   padding: EdgeInsets.all(15.0),
